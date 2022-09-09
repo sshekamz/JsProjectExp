@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+  </head>
+  <body>
+    <div id="head">
+      <h1 style="text-align: center">Expense Tracker</h1>
+    </div>
+    <div id="expid">
+      <form onsubmit="saveToLocalStorage(event)">
+        <label for="Expense amount">Expense amount</label>
+        <input type="text" id="exp" />
+        <label for="Choose Category">Choose Category</label>
+        <select name="choose category" id="cat">
+          <option value="education">Education</option>
+          <option value="Entertainmanent">Entertainmanent</option>
+          <option value="Movie">Movie</option>
+          <option value="Travel">Travel</option>
+          <option value="illness">illness</option>
+        </select>
+        <label for="Description"> Description</label>
+        <input type="text" name="Description" id="desc" />
+        <button>Submit</button>
+      </form>
+      <ul id="expenseList"></ul>
+    </div>
+
+    <script>
+      function saveToLocalStorage(event) {
+        event.preventDefault();
+        //console.log("correct");
+        const amount = event.target.exp.value;
+        const category = event.target.cat.value;
+        const description = event.target.desc.value;
+
+        const obj = {
+          amount,
+          category,
+          description,
+        };
+        localStorage.setItem(obj.description, JSON.stringify(obj));
+        showExpense(obj);
+      }
+      window.addEventListener("DOMContentLoaded", () => {
+        const localStorageObj = localStorage;
+        const localstoragekeys = Object.keys(localStorageObj);
+
+        for (var i = 0; i < localstoragekeys.length; i++) {
+          const key = localstoragekeys[i];
+          const expenseDetailsString = localStorageObj[key];
+          const expenseDetails = JSON.parse(expenseDetailsString);
+          showExpense(expenseDetails);
+        }
+      })
+      function showExpense(expnese){
+        document.getElementById('exp').value='';
+        document.getElementById('cat').value='';
+        document.getElementById('desc').value='';
+
+        if(localStorage.getItem(expnese.description)!==null){
+            removeExpense(expnese.description)
+        }
+        const parentNode=document.getElementById('expenseList');
+        const childHTML=`<li id=${expnese.description}> ${expnese.amount} - ${expnese.category} - ${expnese.description}
+            <button onclick=deleteExpense('${expnese.description}')> Delete</button>
+            <button onclick=editExpense('${expnese.amount}', '${expnese.category}','${expnese.description}')> Edit</button>`
+
+            parentNode.innerHTML = parentNode.innerHTML + childHTML;
+      }
+
+      // Edit User
+      function editExpense(expAmount,category,description){
+        document.getElementById('exp').value=expAmount;
+        document.getElementById('cat').value=category;
+        document.getElementById('desc').value=description;
+
+        deleteExpense(description);
+      }
+
+      //delete Expense
+      function deleteExpense(description){
+        console.log(description);
+        localStorage.removeItem(description);
+        removeExpense(description)
+      }
+
+      function removeExpense(description){
+        const parentNode=document.getElementById('expenseList');
+        const childNodeToBeDeleted=document.getElementById('description');
+        if(childNodeToBeDeleted){
+            parentNode.removeChild(childNodeToBeDeleted)
+        }
+      }
+
+    </script>
+  </body>
+</html>
